@@ -12,7 +12,13 @@
     "coveralls": "c8 report --reporter=text-lcov | coveralls",
     "test": "c8 node test/index.js"
   },
-  "keywords": ["JSON", "DOM", "serialization", "compact", "fast"],
+  "keywords": [
+    "JSON",
+    "DOM",
+    "serialization",
+    "compact",
+    "fast"
+  ],
   "author": "Andrea Giammarchi",
   "license": "ISC",
   "devDependencies": {
@@ -23,6 +29,7 @@
     "ascjs": "^5.0.0",
     "c8": "^7.5.0",
     "coveralls": "^3.1.0",
+    "linkedom": "^0.4.1",
     "rollup": "^2.38.5",
     "rollup-plugin-terser": "^7.0.2",
     "terser": "^5.6.0-beta"

@@ -27,7 +27,7 @@ const fromJSON = (value, ownerDocument = document) => {
       case ELEMENT_NODE:
         const localName = array[i++];
         // avoid re-creating the root element (html, svg, or root)
-        if (skipCheck || localName.toLowerCase() !== parentNode.localName)
+        if (skipCheck || localName.toLowerCase() !== parentNode.localName.toLowerCase())
           parentNode = parentNode.appendChild(doc.createElement(localName));
         skipCheck = true;
         break;
@@ -51,14 +51,15 @@ const fromJSON = (value, ownerDocument = document) => {
         parentNode.appendChild(doc.createComment(array[i++]));
         break;
       case DOCUMENT_NODE:
+        const parser = new ownerDocument.defaultView.DOMParser;
         if (array[i] === DOCUMENT_TYPE_NODE) {
           i++;
-          const parser = new ownerDocument.defaultView.DOMParser;
           switch (array[i++]) {
             case 'html':
             case 'HTML':
               doc = parser.parseFromString('<!DOCTYPE html><html></html>', 'text/html');
               break;
+            /* c8 ignore start */
             case 'svg':
             case 'SVG':
               doc = parser.parseFromString('<!DOCTYPE svg><svg />', 'image/svg+xml');
@@ -66,10 +67,11 @@ const fromJSON = (value, ownerDocument = document) => {
             default:
               doc = parser.parseFromString('<root />', 'text/xml');
               break;
+            /* c8 ignore stop */
           }
         }
         else
-          doc = parser.parseFromString('', 'text/html');
+          doc = parser.parseFromString('<html></html>', 'text/html');
         parentNode = doc.documentElement;
         skipCheck = false;
         break;

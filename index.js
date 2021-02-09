@@ -1,4 +1,4 @@
-self.jsdon = (function (exports) {
+self.JSDON = (function (exports) {
   'use strict';
 
   var NODE_END = -1;
@@ -29,7 +29,7 @@ self.jsdon = (function (exports) {
         case ELEMENT_NODE:
           var localName = array[i++]; // avoid re-creating the root element (html, svg, or root)
 
-          if (skipCheck || localName.toLowerCase() !== parentNode.localName) parentNode = parentNode.appendChild(doc.createElement(localName));
+          if (skipCheck || localName.toLowerCase() !== parentNode.localName.toLowerCase()) parentNode = parentNode.appendChild(doc.createElement(localName));
           skipCheck = true;
           break;
 
@@ -62,27 +62,31 @@ self.jsdon = (function (exports) {
           break;
 
         case DOCUMENT_NODE:
+          var parser = new ownerDocument.defaultView.DOMParser();
+
           if (array[i] === DOCUMENT_TYPE_NODE) {
             i++;
-
-            var _parser = new ownerDocument.defaultView.DOMParser();
 
             switch (array[i++]) {
               case 'html':
               case 'HTML':
-                doc = _parser.parseFromString('<!DOCTYPE html><html></html>', 'text/html');
+                doc = parser.parseFromString('<!DOCTYPE html><html></html>', 'text/html');
                 break;
+
+              /* c8 ignore start */
 
               case 'svg':
               case 'SVG':
-                doc = _parser.parseFromString('<!DOCTYPE svg><svg />', 'image/svg+xml');
+                doc = parser.parseFromString('<!DOCTYPE svg><svg />', 'image/svg+xml');
                 break;
 
               default:
-                doc = _parser.parseFromString('<root />', 'text/xml');
+                doc = parser.parseFromString('<root />', 'text/xml');
                 break;
+
+              /* c8 ignore stop */
             }
-          } else doc = parser.parseFromString('', 'text/html');
+          } else doc = parser.parseFromString('<html></html>', 'text/html');
 
           parentNode = doc.documentElement;
           skipCheck = false;
@@ -107,33 +111,24 @@ self.jsdon = (function (exports) {
     return fragment.firstChild;
   };
 
-  var mergeClosing = function mergeClosing(output, length) {
-    var closing = 0;
-
-    while (length-- && output[length] === NODE_END) {
-      closing += NODE_END;
-    }
-
-    if (closing !== NODE_END) {
-      output[++length] = closing;
-      output.splice(++length);
-    }
+  var mergeClosing = function mergeClosing(output) {
+    var last = output.length - 1;
+    var value = output[last];
+    if (typeof value === 'number' && value < 0) output[last] += NODE_END;else output.push(NODE_END);
   };
 
   var pushAttribute = function pushAttribute(_ref, output) {
     var name = _ref.name,
-        value = _ref.value,
-        nodeType = _ref.nodeType;
-    output.push(nodeType, name);
+        value = _ref.value;
+    output.push(ATTRIBUTE_NODE, name);
     if (value) output.push(value);
   };
 
   var pushElement = function pushElement(_ref2, output, filter) {
     var attributes = _ref2.attributes,
         childNodes = _ref2.childNodes,
-        localName = _ref2.localName,
-        nodeType = _ref2.nodeType;
-    output.push(nodeType, localName);
+        localName = _ref2.localName;
+    output.push(ELEMENT_NODE, localName);
 
     for (var i = 0, length = attributes.length; i < length; i++) {
       pushAttribute(attributes[i], output);
@@ -143,19 +138,17 @@ self.jsdon = (function (exports) {
       pushNode(childNodes[_i], output, filter);
     }
 
-    return output.push(NODE_END);
+    mergeClosing(output);
   };
 
   var pushFragment = function pushFragment(_ref3, output, filter) {
-    var childNodes = _ref3.childNodes,
-        nodeType = _ref3.nodeType;
-    output.push(nodeType);
+    var childNodes = _ref3.childNodes;
 
     for (var i = 0, length = childNodes.length; i < length; i++) {
       pushNode(childNodes[i], output, filter);
     }
 
-    return output.push(NODE_END);
+    mergeClosing(output);
   };
 
   var pushNode = function pushNode(node, output, filter) {
@@ -163,11 +156,7 @@ self.jsdon = (function (exports) {
 
     switch (nodeType) {
       case ELEMENT_NODE:
-        if (filter(node)) mergeClosing(output, pushElement(node, output, filter));
-        break;
-
-      case ATTRIBUTE_NODE:
-        if (filter(node)) pushAttribute(node, output);
+        if (filter(node)) pushElement(node, output, filter);
         break;
 
       case TEXT_NODE:
@@ -177,11 +166,15 @@ self.jsdon = (function (exports) {
 
       case DOCUMENT_FRAGMENT_NODE:
       case DOCUMENT_NODE:
-        if (filter(node)) mergeClosing(output, pushFragment(node, output, filter));
+        if (filter(node)) {
+          output.push(nodeType);
+          pushFragment(node, output, filter);
+        }
+
         break;
 
       case DOCUMENT_TYPE_NODE:
-        if (filter(node)) output.push(nodeType, node.name || '');
+        if (filter(node)) output.push(nodeType, node.name);
         break;
     }
   };

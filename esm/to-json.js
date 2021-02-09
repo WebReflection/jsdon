@@ -9,36 +9,34 @@ import {
   DOCUMENT_FRAGMENT_NODE
 } from './constants.js';
 
-const mergeClosing = (output, length) => {
-  let closing = 0;
-  while (length-- && output[length] === NODE_END)
-    closing += NODE_END;
-  if (closing !== NODE_END) {
-    output[++length] = closing;
-    output.splice(++length);
-  }
+const mergeClosing = output => {
+  const last = output.length - 1;
+  const value = output[last];
+  if (typeof value === 'number' && value < 0)
+    output[last] += NODE_END;
+  else
+    output.push(NODE_END);
 };
 
-const pushAttribute = ({name, value, nodeType}, output) => {
-  output.push(nodeType, name);
+const pushAttribute = ({name, value}, output) => {
+  output.push(ATTRIBUTE_NODE, name);
   if (value)
     output.push(value);
 };
 
-const pushElement = ({attributes, childNodes, localName, nodeType}, output, filter) => {
-  output.push(nodeType, localName);
+const pushElement = ({attributes, childNodes, localName}, output, filter) => {
+  output.push(ELEMENT_NODE, localName);
   for (let i = 0, {length} = attributes; i < length; i++)
     pushAttribute(attributes[i], output);
   for (let i = 0, {length} = childNodes; i < length; i++)
     pushNode(childNodes[i], output, filter);
-  return output.push(NODE_END);
+  mergeClosing(output);
 };
 
-const pushFragment = ({childNodes, nodeType}, output, filter) => {
-  output.push(nodeType);
+const pushFragment = ({childNodes}, output, filter) => {
   for (let i = 0, {length} = childNodes; i < length; i++)
     pushNode(childNodes[i], output, filter);
-  return output.push(NODE_END);
+  mergeClosing(output);
 };
 
 const pushNode = (node, output, filter) => {
@@ -46,11 +44,7 @@ const pushNode = (node, output, filter) => {
   switch (nodeType) {
     case ELEMENT_NODE:
       if (filter(node))
-        mergeClosing(output, pushElement(node, output, filter));
-      break;
-    case ATTRIBUTE_NODE:
-      if (filter(node))
-        pushAttribute(node, output);
+        pushElement(node, output, filter);
       break;
     case TEXT_NODE:
     case COMMENT_NODE:
@@ -59,12 +53,14 @@ const pushNode = (node, output, filter) => {
       break;
     case DOCUMENT_FRAGMENT_NODE:
     case DOCUMENT_NODE:
-      if (filter(node))
-        mergeClosing(output, pushFragment(node, output, filter));
+      if (filter(node)) {
+        output.push(nodeType);
+        pushFragment(node, output, filter);
+      }
       break;
     case DOCUMENT_TYPE_NODE:
       if (filter(node))
-        output.push(nodeType, node.name || '');
+        output.push(nodeType, node.name);
       break;
   }
 };

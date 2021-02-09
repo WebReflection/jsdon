@@ -1,4 +1,4 @@
-# JSDON - Experimental
+# JSDON
 
 A DOM de/serializer based on [LinkeDOM](https://github.com/WebReflection/linkedom#readme) idea, based on the *JSDON* specification, which is something I've just made up.
 
