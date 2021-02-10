@@ -12,6 +12,14 @@ self.JSDON = (function (exports) {
 
   var SVG = 'http://www.w3.org/2000/svg';
   var parse = JSON.parse;
+  /**
+   * Given a JSON string, or a JSDON compatible array, returns
+   * a DOM element representing such value.
+   * @param {string|Array} value
+   * @param {Document?} ownerDocument
+   * @returns {Document|DocumentFragment|Element|Text|Comment}
+   */
+
   var fromJSON = function fromJSON(value) {
     var ownerDocument = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : document;
     var array = typeof value === 'string' ? parse(value) : value;
@@ -191,6 +199,12 @@ self.JSDON = (function (exports) {
   var yes = function yes() {
     return true;
   };
+  /**
+   * Given a generic DOM element, returns a JSDON compatible array that represents it.
+   * @param {Document|DocumentFragment|Element|Text|Comment} node
+   * @param {function?} filter if provided, filters nodes by returning `true` or `false`
+   */
+
 
   var toJSON = function toJSON(node, filter) {
     var output = [];

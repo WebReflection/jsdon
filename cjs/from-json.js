@@ -14,6 +14,13 @@ const SVG = 'http://www.w3.org/2000/svg';
 
 const {parse} = JSON;
 
+/**
+ * Given a JSON string, or a JSDON compatible array, returns
+ * a DOM element representing such value.
+ * @param {string|Array} value
+ * @param {Document?} ownerDocument
+ * @returns {Document|DocumentFragment|Element|Text|Comment}
+ */
 const fromJSON = (value, ownerDocument = document) => {
   const array = typeof value === 'string' ? parse(value) : value;
   const {length} = array;

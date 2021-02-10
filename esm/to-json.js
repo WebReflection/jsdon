@@ -67,6 +67,11 @@ const pushNode = (node, output, filter) => {
 
 const yes = () => true;
 
+/**
+ * Given a generic DOM element, returns a JSDON compatible array that represents it.
+ * @param {Document|DocumentFragment|Element|Text|Comment} node
+ * @param {function?} filter if provided, filters nodes by returning `true` or `false`
+ */
 export const toJSON = (node, filter) => {
   const output = [];
   pushNode(node, output, filter || yes);
