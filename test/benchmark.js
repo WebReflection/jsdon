@@ -1,7 +1,7 @@
 const {readFile} = require('fs');
 const {join} = require('path');
 
-const {DOMParser} = require('linkedom');
+const {DOMParser, parseJSON} = require('linkedom');
 
 const {toJSON, fromJSON} = require('../cjs/index.js');
 
@@ -15,11 +15,6 @@ readFile(join(__dirname, 'html.html'), (_, data) => {
   const document = (new DOMParser).parseFromString(data.toString(), 'text/html');
   document.normalize();
 
-  title = 'LinkeDOM: document.toJSON()';
-  console.time(title);
-  let json = document.toJSON();
-  console.timeEnd(title);
-
   title = 'JSDON: toJSON(document)';
   console.time(title);
   let jsdon = toJSON(document, node => (node.nodeType !== 3 || node.textContent.trim()));
@@ -30,6 +25,23 @@ readFile(join(__dirname, 'html.html'), (_, data) => {
   let doc = fromJSON(jsdon, document);
   console.timeEnd(title);
 
+  title = 'LinkeDOM: document.toJSON()';
+  console.time(title);
+  let json = document.toJSON();
+  console.timeEnd(title);
+
+  title = 'LinkeDOM: parseJSON(json)';
+  console.time(title);
+  let parsed = parseJSON(json);
+  console.timeEnd(title);
+
+  title = 'LinkeDOM: parseJSON(jsdon)';
+  console.time(title);
+  let reparsed = parseJSON(jsdon);
+  console.timeEnd(title);
+
+
+  console.assert(!!reparsed && !!parsed && !!doc);
   for (let i = 0, {length} = jsdon; i < length; i++)
     console.assert(trim(jsdon[i]) === trim(json[i]), json[i]);
 });
