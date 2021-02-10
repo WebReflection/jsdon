@@ -4,7 +4,7 @@
 
 <sup>**Social Media Photo by [Reign Abarintos](https://unsplash.com/@jareeign) on [Unsplash](https://unsplash.com/)**</sup>
 
-A DOM de/serializer based on [LinkeDOM](https://github.com/WebReflection/linkedom#readme) idea, based on the *JSDON* specification <sup><sub>(which is something I've just made up)</sub></sup>.
+A DOM de/serializer based on [LinkeDOM](https://github.com/WebReflection/linkedom#readme) idea and the *JSDON* specification <sup><sub>(which is something I've just made up)</sub></sup>.
 
 ## Why
 
