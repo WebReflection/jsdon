@@ -29,33 +29,37 @@ self.JSDON = (function (exports) {
       switch (nodeType) {
         case ELEMENT_NODE:
           var localName = array[i++];
-          var lowerName = localName.toLowerCase(); // avoid re-creating the root element (html, svg, or root)
+          var lowerName = localName.toLowerCase();
+          var attributes = [];
+          var _length = 0;
+          var is = '';
+
+          while (array[i] === ATTRIBUTE_NODE) {
+            var name = array[++i];
+
+            var _value = typeof array[i + 1] === 'string' ? array[++i] : '';
+
+            if (name === 'is') is = _value;
+            _length = attributes.push({
+              name: name,
+              value: _value
+            });
+            i++;
+          } // avoid re-creating the root element (html, svg, or root)
+
 
           if (skipCheck || lowerName !== parentNode.localName.toLowerCase()) {
-            parentNode = parentNode.appendChild(lowerName === 'svg' || 'ownerSVGElement' in parentNode ? doc.createElementNS(SVG, localName) : doc.createElement(localName));
+            parentNode = parentNode.appendChild(lowerName === 'svg' || 'ownerSVGElement' in parentNode ? doc.createElementNS(SVG, localName) : is ? doc.createElement(localName, {
+              is: is
+            }) : doc.createElement(localName));
+          } // TODO: setAttributeNS (meh?)
+
+
+          for (var j = 0; j < _length; j++) {
+            parentNode.setAttribute(attributes[j].name, attributes[j].value);
           }
 
           skipCheck = true;
-          break;
-
-        case ATTRIBUTE_NODE:
-          var name = array[i++];
-
-          var _value = i < length && typeof array[i] === 'string' ? array[i++] : '';
-
-          if (name === 'is') {
-            var ce = doc.createElement(parentNode.localName, {
-              is: _value
-            });
-
-            for (var _parentNode = parentNode, attributes = _parentNode.attributes, _length = attributes.length, _i = 0; _i < _length; _i++) {
-              ce.setAttributeNode(attributes[_i]);
-            }
-
-            parentNode.parentNode.replaceChild(ce, parentNode);
-            parentNode = ce;
-          } else parentNode.setAttribute(name, _value);
-
           break;
 
         case TEXT_NODE:

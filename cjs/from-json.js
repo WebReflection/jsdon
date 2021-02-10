@@ -29,28 +29,29 @@ const fromJSON = (value, ownerDocument = document) => {
       case ELEMENT_NODE:
         const localName = array[i++];
         const lowerName = localName.toLowerCase();
+        const attributes = [];
+        let length = 0;
+        let is = '';
+        while (array[i] === ATTRIBUTE_NODE) {
+          const name = array[++i];
+          const value = typeof array[i + 1] === 'string' ? array[++i] : '';
+          if (name === 'is')
+            is = value;
+          length = attributes.push({name, value});
+          i++;
+        }
         // avoid re-creating the root element (html, svg, or root)
         if (skipCheck || lowerName !== parentNode.localName.toLowerCase()) {
           parentNode = parentNode.appendChild(
             (lowerName === 'svg' || 'ownerSVGElement' in parentNode) ?
               doc.createElementNS(SVG, localName) :
-              doc.createElement(localName)
+              (is ? doc.createElement(localName, {is}) : doc.createElement(localName))
           );
         }
+        // TODO: setAttributeNS (meh?)
+        for (let j = 0; j < length; j++)
+          parentNode.setAttribute(attributes[j].name, attributes[j].value);
         skipCheck = true;
-        break;
-      case ATTRIBUTE_NODE:
-        const name = array[i++];
-        const value = i < length && typeof array[i] === 'string' ? array[i++] : '';
-        if (name === 'is') {
-          const ce = doc.createElement(parentNode.localName, {is: value});
-          for (let {attributes} = parentNode, {length} = attributes, i = 0; i < length; i++)
-            ce.setAttributeNode(attributes[i]);
-          parentNode.parentNode.replaceChild(ce, parentNode);
-          parentNode = ce;
-        }
-        else
-          parentNode.setAttribute(name, value);
         break;
       case TEXT_NODE:
         parentNode.appendChild(doc.createTextNode(array[i++]));
