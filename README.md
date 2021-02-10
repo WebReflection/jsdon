@@ -1,6 +1,10 @@
 # JSDON
 
-A DOM de/serializer based on [LinkeDOM](https://github.com/WebReflection/linkedom#readme) idea, based on the *JSDON* specification, which is something I've just made up.
+[![Build Status](https://travis-ci.com/WebReflection/jsdon.svg?branch=main)](https://travis-ci.com/WebReflection/jsdon) [![Coverage Status](https://coveralls.io/repos/github/WebReflection/jsdon/badge.svg?branch=main)](https://coveralls.io/github/WebReflection/jsdon?branch=main)
+
+<sup>**Social Media Photo by [Reign Abarintos](https://unsplash.com/@jareeign) on [Unsplash](https://unsplash.com/)**</sup>
+
+A DOM de/serializer based on [LinkeDOM](https://github.com/WebReflection/linkedom#readme) idea, based on the *JSDON* specification <sup><sub>(which is something I've just made up)</sub></sup>.
 
 ## Why
 
