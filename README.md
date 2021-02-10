@@ -125,7 +125,3 @@ The extra, optional, `document` parameter, is to let environments not running wi
   * DOCUMENT_NODE
   * DOCUMENT_TYPE_NODE
   * DOCUMENT_FRAGMENT_NODE
-
-### TODO
-
-Currently, *SVG* nodes are not serialized back in a meaningful way.

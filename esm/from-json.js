@@ -9,6 +9,8 @@ import {
   DOCUMENT_FRAGMENT_NODE
 } from './constants.js';
 
+const SVG = 'http://www.w3.org/2000/svg';
+
 const {parse} = JSON;
 
 export const fromJSON = (value, ownerDocument = document) => {
@@ -25,9 +27,15 @@ export const fromJSON = (value, ownerDocument = document) => {
     switch (nodeType) {
       case ELEMENT_NODE:
         const localName = array[i++];
+        const lowerName = localName.toLowerCase();
         // avoid re-creating the root element (html, svg, or root)
-        if (skipCheck || localName.toLowerCase() !== parentNode.localName.toLowerCase())
-          parentNode = parentNode.appendChild(doc.createElement(localName));
+        if (skipCheck || lowerName !== parentNode.localName.toLowerCase()) {
+          parentNode = parentNode.appendChild(
+            (lowerName === 'svg' || 'ownerSVGElement' in parentNode) ?
+              doc.createElementNS(SVG, localName) :
+              doc.createElement(localName)
+          );
+        }
         skipCheck = true;
         break;
       case ATTRIBUTE_NODE:

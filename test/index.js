@@ -1,8 +1,6 @@
 const {DOMParser} = require('linkedom');
-// not needed with next linkedom update
-global.DOMParser = DOMParser;
 
-const {toJSON, fromJSON} = require('../cjs');
+const {toJSON, fromJSON} = require('../cjs/index.js');
 
 let document = (new DOMParser).parseFromString(`
 <!doctype html>
@@ -65,3 +63,8 @@ console.assert(fromJSON([], document) === null, 'fromJSON empty is null');
 fragment = document.createDocumentFragment();
 fragment.append(document.createTextNode('OK'));
 console.assert(fromJSON(toJSON(fragment), document).childNodes.join('') === 'OK', 'fromJSON fragment is OK');
+
+// document = (new DOMParser).parseFromString(`<!doctype html><html><svg><rect /></svg></html>`, 'text/html');
+document = fromJSON([9,10,"html",1,"html",1,"svg",1,"rect",-4], document);
+
+console.assert('ownerSVGElement' in document.querySelector('svg'), 'svg restored');

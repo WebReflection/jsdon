@@ -10,6 +10,7 @@ self.JSDON = (function (exports) {
   var DOCUMENT_TYPE_NODE = 10;
   var DOCUMENT_FRAGMENT_NODE = 11;
 
+  var SVG = 'http://www.w3.org/2000/svg';
   var parse = JSON.parse;
   var fromJSON = function fromJSON(value) {
     var ownerDocument = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : document;
@@ -27,9 +28,13 @@ self.JSDON = (function (exports) {
 
       switch (nodeType) {
         case ELEMENT_NODE:
-          var localName = array[i++]; // avoid re-creating the root element (html, svg, or root)
+          var localName = array[i++];
+          var lowerName = localName.toLowerCase(); // avoid re-creating the root element (html, svg, or root)
 
-          if (skipCheck || localName.toLowerCase() !== parentNode.localName.toLowerCase()) parentNode = parentNode.appendChild(doc.createElement(localName));
+          if (skipCheck || lowerName !== parentNode.localName.toLowerCase()) {
+            parentNode = parentNode.appendChild(lowerName === 'svg' || 'ownerSVGElement' in parentNode ? doc.createElementNS(SVG, localName) : doc.createElement(localName));
+          }
+
           skipCheck = true;
           break;
 
