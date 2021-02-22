@@ -12,4 +12,4 @@ console.assert(html.parentNode === document);
 console.assert(body.parentNode === html);
 console.assert(body.childNodes.every(node => node.parentNode === body));
 
-console.assert(JSON.stringify(toJSON(document)) === JSON.stringify(json));
+console.assert(JSON.stringify(document) === JSON.stringify(json));

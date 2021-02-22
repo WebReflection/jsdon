@@ -8,6 +8,8 @@ import {
   DOCUMENT_FRAGMENT_NODE
 } from './constants.js';
 
+import {toJSON} from './to-json.js';
+
 export {
   ELEMENT_NODE,
   ATTRIBUTE_NODE,
@@ -24,6 +26,10 @@ export class Node {
     this.localName = localName;
     this.ownerDocument = ownerDocument;
     this.parentNode = null;
+  }
+
+  toJSON() {
+    return toJSON(this);
   }
 }
 

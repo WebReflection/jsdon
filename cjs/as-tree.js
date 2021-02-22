@@ -9,6 +9,8 @@ const {
   DOCUMENT_FRAGMENT_NODE
 } = require('./constants.js');
 
+const {toJSON} = require('./to-json.js');
+
 exports.ELEMENT_NODE = ELEMENT_NODE;
 exports.ATTRIBUTE_NODE = ATTRIBUTE_NODE;
 exports.TEXT_NODE = TEXT_NODE;
@@ -23,6 +25,10 @@ class Node {
     this.localName = localName;
     this.ownerDocument = ownerDocument;
     this.parentNode = null;
+  }
+
+  toJSON() {
+    return toJSON(this);
   }
 }
 exports.Node = Node
