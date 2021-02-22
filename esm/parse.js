@@ -77,6 +77,8 @@ const prepareMatch = selectors => {
 };
 
 import {
+  ELEMENT_NODE,
+  TEXT_NODE,
   Attr,
   Comment,
   Document,

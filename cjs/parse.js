@@ -78,6 +78,8 @@ const prepareMatch = selectors => {
 };
 
 const {
+  ELEMENT_NODE,
+  TEXT_NODE,
   Attr,
   Comment,
   Document,
