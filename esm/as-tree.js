@@ -21,6 +21,11 @@ export {
 };
 
 export class Node {
+  /**
+   * @param {Document?} ownerDocument node owner document
+   * @param {number} nodeType node type
+   * @param {string} localName node local name
+   */
   constructor(ownerDocument, nodeType, localName) {
     this.nodeType = nodeType;
     this.localName = localName;
@@ -34,6 +39,11 @@ export class Node {
 }
 
 export class Attr extends Node {
+  /**
+   * @param {Document?} ownerDocument attribute owner document
+   * @param {string} name attribute name
+   * @param {string} value attribute value
+   */
   constructor(ownerDocument, name, value) {
     super(ownerDocument, ATTRIBUTE_NODE, '#attribute');
     this.name = name;
@@ -43,6 +53,10 @@ export class Attr extends Node {
 }
 
 export class Comment extends Node {
+  /**
+   * @param {Document?} ownerDocument comment owner document
+   * @param {string} data comment data value
+   */
   constructor(ownerDocument, data) {
     super(ownerDocument, COMMENT_NODE, '#comment');
     this.data = data;
@@ -50,6 +64,10 @@ export class Comment extends Node {
 }
 
 export class Text extends Node {
+  /**
+   * @param {Document?} ownerDocument text owner document
+   * @param {string} data text data value
+   */
   constructor(ownerDocument, data) {
     super(ownerDocument, TEXT_NODE, '#text');
     this.data = data;
@@ -57,6 +75,10 @@ export class Text extends Node {
 }
 
 export class DocumentType extends Node {
+  /**
+   * @param {Document?} ownerDocument node owner document
+   * @param {string} name doctype name
+   */
   constructor(ownerDocument, name) {
     super(ownerDocument, DOCUMENT_TYPE_NODE, '#doctype');
     this.name = name;
@@ -66,6 +88,9 @@ export class DocumentType extends Node {
 export class ParentNode extends Node {
   constructor(ownerDocument, nodeType, localName) {
     super(ownerDocument, nodeType, localName);
+    /**
+     * @type {Element[]|Text[]|Comment[]} Parent child nodes
+     */
     this.childNodes = [];
   }
 }
@@ -77,14 +102,24 @@ export class Document extends ParentNode {
 }
 
 export class DocumentFragment extends ParentNode {
+  /**
+   * @param {Document?} ownerDocument Fragment owner document
+   */
   constructor(ownerDocument) {
     super(ownerDocument, DOCUMENT_FRAGMENT_NODE, '#document-fragment');
   }
 }
 
 export class Element extends ParentNode {
+  /**
+   * @param {Document?} ownerDocument Element owner document
+   * @param {string} localName Element local name
+   */
   constructor(ownerDocument, localName) {
     super(ownerDocument, ELEMENT_NODE, localName);
+    /**
+     * @type {Attr[]} Element attributes
+     */
     this.attributes = [];
   }
 }
@@ -172,6 +207,10 @@ const toElement = (jsdon, element, i, length) => {
   }
 };
 
+/**
+ * @param {array} jsdon a valid jsdon array
+ * @returns {Document|DocumentFragment|Element} an DOM tree
+ */
 export const asTree = (jsdon) => {
   const {length} = jsdon;
   switch (length && jsdon[0]) {

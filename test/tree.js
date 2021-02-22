@@ -1,4 +1,3 @@
-const {toJSON} = require('../cjs/to-json.js');
 const {asTree} = require('../cjs/as-tree.js');
 
 const json = [9,10,"html",1,"html",2,"lang","en",1,"head",-1,1,"body",3,"\n    Text\n    ",8,"Comment",-3];
