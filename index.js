@@ -178,7 +178,7 @@ self.JSDON = (function (exports) {
 
       case TEXT_NODE:
       case COMMENT_NODE:
-        if (filter(node)) output.push(nodeType, node.textContent);
+        if (filter(node)) output.push(nodeType, node.data);
         break;
 
       case DOCUMENT_FRAGMENT_NODE:
