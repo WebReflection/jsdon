@@ -132,6 +132,15 @@ class QSElement extends Element {
   get children() {
     return this.childNodes.filter(isTag);
   }
+  remove() {
+    const {parentNode} = this;
+    if (parentNode) {
+      const {childNodes} = parentNode;
+      const i = childNodes.indexOf(this);
+      if (-1 < i)
+        childNodes.splice(i, 1);
+    }
+  }
   getElementsByTagName(tagName) {
     return this.querySelectorAll(tagName);
   }
