@@ -23,8 +23,8 @@ export {
 const cloneChildNodes = (childNodes, target, ownerDocument) => {
   for (let {length} = childNodes, i = 0; i < length; i++) {
     const child = childNodes[i].cloneNode(true);
-    child.parentNode = target;
     child.ownerDocument = ownerDocument;
+    child.parentNode = target;
     target.childNodes.push(child);
   }
 };
