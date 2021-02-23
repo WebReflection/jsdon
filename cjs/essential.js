@@ -19,6 +19,15 @@ exports.DOCUMENT_NODE = DOCUMENT_NODE;
 exports.DOCUMENT_TYPE_NODE = DOCUMENT_TYPE_NODE;
 exports.DOCUMENT_FRAGMENT_NODE = DOCUMENT_FRAGMENT_NODE;
 
+const cloneChildNodes = (childNodes, target, ownerDocument) => {
+  for (let {length} = childNodes, i = 0; i < length; i++) {
+    const child = childNodes[i].cloneNode(true);
+    child.parentNode = target;
+    child.ownerDocument = ownerDocument;
+    target.childNodes.push(child);
+  }
+};
+
 const elements = ({nodeType}) => nodeType === ELEMENT_NODE;
 
 const remove = node => {
@@ -128,7 +137,11 @@ class Document extends ParentNode {
   }
 
   cloneNode(deep = false) {
-    return new this.constructor;
+    const {constructor, childNodes} = this;
+    const document = new constructor;
+    if (deep)
+      cloneChildNodes(childNodes, document, document);
+    return document;
   }
 }
 exports.Document = Document
@@ -139,8 +152,11 @@ class DocumentFragment extends ParentNode {
   }
 
   cloneNode(deep = false) {
-    const {constructor, ownerDocument} = this;
-    return new constructor(ownerDocument);
+    const {constructor, childNodes, ownerDocument} = this;
+    const fragment = new constructor(ownerDocument);
+    if (deep)
+      cloneChildNodes(childNodes, fragment, ownerDocument);
+    return fragment;
   }
 }
 exports.DocumentFragment = DocumentFragment
@@ -159,13 +175,8 @@ class Element extends ParentNode {
       attr.ownerElement = element;
       element.attributes.push(attr);
     }
-    if (deep) {
-      for (let {length} = childNodes, i = 0; i < length; i++) {
-        const child = childNodes[i].cloneNode(deep);
-        child.parentNode = element;
-        element.childNodes.push(child);
-      }
-    }
+    if (deep)
+      cloneChildNodes(childNodes, element, ownerDocument);
     return element;
   }
 
