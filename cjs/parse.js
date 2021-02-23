@@ -80,22 +80,22 @@ const prepareMatch = selectors => {
 const {
   ELEMENT_NODE,
   TEXT_NODE,
-  Attr,
-  Comment,
   Document,
-  DocumentType,
   Element,
-  Text
+  Attr,
+  Text,
+  Comment,
+  DocumentType
 } = require('./as-tree.js');
 
 const {keys} = Object;
 
-const querySelector = ({childNodes}, matches) => {
+const matchOne = ({childNodes}, matches) => {
   for (const child of childNodes) {
     if (child.nodeType === ELEMENT_NODE) {
       if (matches(child))
         return child;
-      const node = querySelector(child, matches);
+      const node = matchOne(child, matches);
       if (node)
         return selectors;
     }
@@ -103,89 +103,55 @@ const querySelector = ({childNodes}, matches) => {
   return null;
 };
 
-const querySelectorAll = ({childNodes}, matches) => {
+const matchAll = ({childNodes}, matches) => {
   const elements = [];
   for (const child of childNodes) {
     if (child.nodeType === ELEMENT_NODE) {
       if (matches(child))
         elements.push(child);
-      elements.push(...querySelectorAll(child, matches));
+      elements.push(...matchAll(child, matches));
     }
   }
   return elements;
 };
 
-class QSDocument extends Document {
-  get documentElement() { return this.querySelector('html'); }
-  getElementsByTagName(tagName) {
-    return this.querySelectorAll(tagName);
-  }
-  querySelector(selectors) {
-    return querySelector(this, prepareMatch(selectors));
-  }
-  querySelectorAll(selectors) {
-    return querySelectorAll(this, prepareMatch(selectors));
-  }
-}
+(m => Object.keys(m).map(k => k !== 'default' && (exports[k] = m[k])))
+(require('./essential.js'));
 
-class QSElement extends Element {
-  get children() {
-    return this.childNodes.filter(isTag);
-  }
-  remove() {
-    const {parentNode} = this;
-    if (parentNode) {
-      const {childNodes} = parentNode;
-      const i = childNodes.indexOf(this);
-      if (-1 < i)
-        childNodes.splice(i, 1);
-    }
-  }
-  getElementsByTagName(tagName) {
-    return this.querySelectorAll(tagName);
-  }
-  querySelector(selectors) {
-    return querySelector(this, prepareMatch(selectors));
-  }
-  querySelectorAll(selectors) {
-    return querySelectorAll(this, prepareMatch(selectors));
-  }
-}
+const querySelector = (node, selectors) => matchOne(node, prepareMatch(selectors));
+exports.querySelector = querySelector;
+const querySelectorAll = (node, selectors) => matchAll(node, prepareMatch(selectors));
+exports.querySelectorAll = querySelectorAll;
 
-class QSComment extends Comment {
-  get textContent() { return this.data; }
-  set textContent(value) { this.data = value; }
-  get nodeValue() { return this.data; }
-  set nodeValue(value) { this.data = value; }
-}
+const parse = (markupLanguage, classes = {}) => {
 
-class QSText extends Text {
-  get textContent() { return this.data; }
-  set textContent(value) { this.data = value; }
-  get nodeValue() { return this.data; }
-  set nodeValue(value) { this.data = value; }
-}
+  classes = {
+    Document: classes.Document || Document,
+    Element: classes.Element || Element,
+    Attr: classes.Attr || Attr,
+    Text: classes.Text || Text,
+    Comment: classes.Comment || Comment,
+    DocumentType: classes.DocumentType || DocumentType
+  };
 
-const parse = markupLanguage => {
-
-  const document = new QSDocument;
+  const document = new classes.Document;
   let parentNode = document;
   
   const content = new Parser({
     // <!DOCTYPE ...>
     onprocessinginstruction(name, data) {
       if (name.toLowerCase() === '!doctype')
-        parentNode.childNodes.push(new DocumentType(
-          document,
-          data.slice(name.length).trim())
+        parentNode.childNodes.push(new classes.DocumentType(
+          data.slice(name.length).trim()),
+          document
         );
     },
 
     // <tagName>
     onopentag(name, attributes) {
-      const element = new QSElement(document, name);
+      const element = new classes.Element(name, document);
       for (const name of keys(attributes)) {
-        const attribute = new Attr(document, name, attributes[name]);
+        const attribute = new classes.Attr(name, attributes[name], document);
         attribute.ownerElement = element;
         element.attributes.push(attribute);
       }
@@ -196,13 +162,13 @@ const parse = markupLanguage => {
 
     // #text, #comment
     oncomment(data) {
-      const comment = new QSComment(document, data);
+      const comment = new classes.Comment(data, document);
       comment.parentNode = parentNode;
       parentNode.childNodes.push(comment);
     },
 
     ontext(data) {
-      const text = new QSText(document, data);
+      const text = new classes.Text(data, document);
       text.parentNode = parentNode;
       parentNode.childNodes.push(text);
     },
