@@ -19,6 +19,17 @@ exports.DOCUMENT_NODE = DOCUMENT_NODE;
 exports.DOCUMENT_TYPE_NODE = DOCUMENT_TYPE_NODE;
 exports.DOCUMENT_FRAGMENT_NODE = DOCUMENT_FRAGMENT_NODE;
 
+const elements = ({nodeType}) => nodeType === ELEMENT_NODE;
+
+const remove = node => {
+  const {parentNode} = node;
+  if (parentNode) {
+    node.parentNode = null;
+    const {childNodes} = parentNode;
+    childNodes.splice(childNodes.indexOf(node), 1);
+  }
+};
+
 class Node {
   static get ELEMENT_NODE() { return ELEMENT_NODE; }
   static get ATTRIBUTE_NODE() { return ATTRIBUTE_NODE; }
@@ -54,6 +65,11 @@ class Attr extends Node {
     this.value = value;
     this.ownerElement = null;
   }
+
+  cloneNode() {
+    const {constructor, name, value, ownerDocument} = this;
+    return new constructor(name, value, ownerDocument);
+  }
 }
 exports.Attr = Attr
 
@@ -62,10 +78,22 @@ class DocumentType extends Node {
     super(DOCUMENT_TYPE_NODE, '#doctype', ownerDocument);
     this.name = name;
   }
+
+  cloneNode() {
+    const {constructor, name, ownerDocument} = this;
+    return new constructor(name, ownerDocument);
+  }
 }
 exports.DocumentType = DocumentType
 
-class CharacterData extends Node {}
+class CharacterData extends Node {
+  cloneNode() {
+    const {constructor, data, ownerDocument} = this;
+    return new constructor(data, ownerDocument);
+  }
+
+  remove() { remove(this); }
+}
 exports.CharacterData = CharacterData
 
 class Comment extends CharacterData {
@@ -89,6 +117,8 @@ class ParentNode extends Node {
     super(nodeType, localName, ownerDocument);
     this.childNodes = [];
   }
+
+  get children() { return this.childNodes.filter(elements); }
 }
 exports.ParentNode = ParentNode
 
@@ -96,12 +126,21 @@ class Document extends ParentNode {
   constructor() {
     super(DOCUMENT_NODE, '#document', null);
   }
+
+  cloneNode(deep = false) {
+    return new this.constructor;
+  }
 }
 exports.Document = Document
 
 class DocumentFragment extends ParentNode {
   constructor(ownerDocument) {
     super(DOCUMENT_FRAGMENT_NODE, '#document-fragment', ownerDocument);
+  }
+
+  cloneNode(deep = false) {
+    const {constructor, ownerDocument} = this;
+    return new constructor(ownerDocument);
   }
 }
 exports.DocumentFragment = DocumentFragment
@@ -111,5 +150,25 @@ class Element extends ParentNode {
     super(ELEMENT_NODE, localName, ownerDocument);
     this.attributes = [];
   }
+
+  cloneNode(deep = false) {
+    const {constructor, attributes, childNodes, localName, ownerDocument} = this;
+    const element = new constructor(localName, ownerDocument);
+    for (let {length} = attributes, i = 0; i < length; i++) {
+      const attr = attributes[i].cloneNode();
+      attr.ownerElement = element;
+      element.attributes.push(attr);
+    }
+    if (deep) {
+      for (let {length} = childNodes, i = 0; i < length; i++) {
+        const child = childNodes[i].cloneNode(deep);
+        child.parentNode = element;
+        element.childNodes.push(child);
+      }
+    }
+    return element;
+  }
+
+  remove() { remove(this); }
 }
 exports.Element = Element
