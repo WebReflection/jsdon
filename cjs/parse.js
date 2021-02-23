@@ -136,7 +136,7 @@ const parse = (markupLanguage, classes = {}) => {
 
   const document = new classes.Document;
   let parentNode = document;
-  
+
   const content = new Parser({
     // <!DOCTYPE ...>
     onprocessinginstruction(name, data) {
