@@ -116,7 +116,7 @@ const querySelectorAll = ({childNodes}, matches) => {
 };
 
 class QSDocument extends Document {
-  get documentElement() { return this.childNodes[this.childNodes.length - 1]; }
+  get documentElement() { return this.querySelector('html'); }
   getElementsByTagName(tagName) {
     return this.querySelectorAll(tagName);
   }
@@ -129,6 +129,9 @@ class QSDocument extends Document {
 }
 
 class QSElement extends Element {
+  get children() {
+    return this.childNodes.filter(isTag);
+  }
   getElementsByTagName(tagName) {
     return this.querySelectorAll(tagName);
   }
