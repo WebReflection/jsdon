@@ -91,7 +91,7 @@ const array = toJSON(document);
 const doc = fromJSON(array);
 ```
 
-This module makes it possible to shrink *HTML* into a linear, stream-able, representation of the tree, linearized via *linkedom* logic, to transport any kind of layout without extra bloat, also preserving *Custom ELements builtin extends*.
+This module makes it possible to shrink *HTML* into a linear, stream-able, representation of the tree, linearized via *linkedom* logic, to transport any kind of layout without extra bloat, also preserving *Custom Elements builtin extends*.
 
 ## API
 

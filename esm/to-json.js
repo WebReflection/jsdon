@@ -59,8 +59,14 @@ const pushNode = (node, output, filter) => {
       }
       break;
     case DOCUMENT_TYPE_NODE:
-      if (filter(node))
-        output.push(nodeType, node.name);
+      if (filter(node)) {
+        const {name, publicId, systemId} = node;
+        output.push(nodeType, name);
+        if (publicId)
+          output.push(publicId);
+        if (systemId)
+          output.push(systemId);
+      }
       break;
   }
 };

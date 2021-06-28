@@ -69,15 +69,27 @@ export const fromJSON = (value, ownerDocument = document) => {
         const parser = new ownerDocument.defaultView.DOMParser;
         if (array[i] === DOCUMENT_TYPE_NODE) {
           i++;
-          switch (array[i++]) {
+          const name = array[i++];
+          const args = [name];
+          while (typeof array[i] === 'string')
+            args.push(`"${array[i++]}"`);
+          switch (args.length) {
+            case 2:
+              args[1] = `${/\.dtd"$/i.test(args[1]) ? 'SYSTEM' : 'PUBLIC'} ${args[1]}`;
+              break;
+            case 3:
+              args[1] = `PUBLIC ${args[1]}`;
+              break;
+          }
+          switch (name) {
             case 'html':
             case 'HTML':
-              doc = parser.parseFromString('<!DOCTYPE html><html></html>', 'text/html');
+              doc = parser.parseFromString(`<!DOCTYPE ${args.join(' ')}><html></html>`, 'text/html');
               break;
             /* c8 ignore start */
             case 'svg':
             case 'SVG':
-              doc = parser.parseFromString('<!DOCTYPE svg><svg />', 'image/svg+xml');
+              doc = parser.parseFromString(`<!DOCTYPE ${args.join(' ')}><svg />`, 'image/svg+xml');
               break;
             default:
               doc = parser.parseFromString('<root />', 'text/xml');

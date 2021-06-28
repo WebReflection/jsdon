@@ -83,18 +83,34 @@ self.JSDON = (function (exports) {
 
           if (array[i] === DOCUMENT_TYPE_NODE) {
             i++;
+            var _name = array[i++];
+            var args = [_name];
 
-            switch (array[i++]) {
+            while (typeof array[i] === 'string') {
+              args.push("\"".concat(array[i++], "\""));
+            }
+
+            switch (args.length) {
+              case 2:
+                args[1] = "".concat(/\.dtd"$/i.test(args[1]) ? 'SYSTEM' : 'PUBLIC', " ").concat(args[1]);
+                break;
+
+              case 3:
+                args[1] = "PUBLIC ".concat(args[1]);
+                break;
+            }
+
+            switch (_name) {
               case 'html':
               case 'HTML':
-                doc = parser.parseFromString('<!DOCTYPE html><html></html>', 'text/html');
+                doc = parser.parseFromString("<!DOCTYPE ".concat(args.join(' '), "><html></html>"), 'text/html');
                 break;
 
               /* c8 ignore start */
 
               case 'svg':
               case 'SVG':
-                doc = parser.parseFromString('<!DOCTYPE svg><svg />', 'image/svg+xml');
+                doc = parser.parseFromString("<!DOCTYPE ".concat(args.join(' '), "><svg />"), 'image/svg+xml');
                 break;
 
               default:
@@ -191,7 +207,15 @@ self.JSDON = (function (exports) {
         break;
 
       case DOCUMENT_TYPE_NODE:
-        if (filter(node)) output.push(nodeType, node.name);
+        if (filter(node)) {
+          var name = node.name,
+              publicId = node.publicId,
+              systemId = node.systemId;
+          output.push(nodeType, name);
+          if (publicId) output.push(publicId);
+          if (systemId) output.push(systemId);
+        }
+
         break;
     }
   };

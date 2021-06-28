@@ -56,7 +56,7 @@ console.assert(
 
 
 console.assert(fromJSON('[1,"test",-1]', document).outerHTML === '<test></test>', 'fromJSON element is OK');
-console.assert(fromJSON('[1,"test",2,"ok",2,"is","custom",-1]', document).outerHTML === '<test ok is="custom"></test>', 'fromJSON attribute is OK');
+console.assert(fromJSON('[1,"test",2,"ok",2,"is","custom",-1]', document).outerHTML === '<test ok="" is="custom"></test>', 'fromJSON attribute is OK');
 console.assert(fromJSON('[3,"test"]', document).toString() === 'test', 'fromJSON text is OK');
 console.assert(fromJSON('[8,"test"]', document).toString() === '<!--test-->', 'fromJSON comment is OK');
 console.assert(fromJSON([], document) === null, 'fromJSON empty is null');
@@ -68,3 +68,10 @@ console.assert(fromJSON(toJSON(fragment), document).childNodes.join('') === 'OK'
 document = fromJSON([9,10,"html",1,"html",1,"svg",1,"rect",-4], document);
 
 console.assert('ownerSVGElement' in document.querySelector('svg'), 'svg restored');
+
+document = fromJSON([9,10,"html","-//W3C//DTD HTML 4.01//EN","http://www.w3.org/TR/html4/strict.dtd",1,"html",1,"svg",1,"rect",-4], document);
+console.assert(JSON.stringify(toJSON(document)) === JSON.stringify([9,10,"html","-//W3C//DTD HTML 4.01//EN","http://www.w3.org/TR/html4/strict.dtd",1,"html",1,"svg",1,"rect",-4]));
+document = fromJSON([9,10,"html","-//IETF//DTD HTML 2.0//EN",1,"html",1,"svg",1,"rect",-4], document);
+console.assert(JSON.stringify(toJSON(document)) === JSON.stringify([9,10,"html","-//IETF//DTD HTML 2.0//EN",1,"html",1,"svg",1,"rect",-4]));
+document = fromJSON([9,10,"html","http://www.w3.org/TR/xhtml-basic/xhtml-basic10.dtd",1,"html",1,"svg",1,"rect",-4], document);
+console.assert(JSON.stringify(toJSON(document)) === JSON.stringify([9,10,"html","http://www.w3.org/TR/xhtml-basic/xhtml-basic10.dtd",1,"html",1,"svg",1,"rect",-4]));
