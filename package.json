@@ -1,6 +1,6 @@
 {
   "name": "jsdon",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "description": "A DOM serializer based on LinkeDOM idea",
   "main": "./cjs/index.js",
   "scripts": {
