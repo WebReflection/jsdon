@@ -42,13 +42,17 @@
       "import": "./esm/index.js",
       "default": "./cjs/index.js"
     },
-    "./tree": {
-      "import": "./esm/as-tree.js",
-      "default": "./cjs/as-tree.js"
+    "./constants": {
+      "import": "./esm/constants.js",
+      "default": "./cjs/constants.js"
     },
     "./parse": {
       "import": "./esm/parse.js",
       "default": "./cjs/parse.js"
+    },
+    "./tree": {
+      "import": "./esm/as-tree.js",
+      "default": "./cjs/as-tree.js"
     },
     "./package.json": "./package.json"
   },
