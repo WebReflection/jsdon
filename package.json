@@ -9,8 +9,8 @@
     "rollup:es": "rollup --config rollup/es.config.js && sed -i.bck 's/^var /self./' es.js && rm -rf es.js.bck",
     "rollup:babel": "rollup --config rollup/babel.config.js && sed -i.bck 's/^var /self./' index.js && rm -rf index.js.bck",
     "min": "terser index.js --comments='/^!/' -c -m -o min.js",
-    "coveralls": "c8 report --reporter=text-lcov | coveralls",
-    "test": "c8 node test/index.js"
+    "test": "c8 node test/index.js",
+    "coverage": "mkdir -p ./coverage; c8 report --reporter=text-lcov > ./coverage/lcov.info"
   },
   "keywords": [
     "JSON",
@@ -22,19 +22,18 @@
   "author": "Andrea Giammarchi",
   "license": "ISC",
   "devDependencies": {
-    "@babel/core": "^7.14.6",
-    "@babel/preset-env": "^7.14.7",
-    "@rollup/plugin-babel": "^5.3.0",
-    "@rollup/plugin-node-resolve": "^13.0.0",
-    "ascjs": "^5.0.1",
-    "c8": "^7.7.3",
-    "coveralls": "^3.1.0",
-    "css-select": "^4.1.3",
-    "htmlparser2": "^6.1.0",
-    "linkedom": "^0.9.7",
-    "rollup": "^2.52.3",
-    "rollup-plugin-terser": "^7.0.2",
-    "terser": "^5.7.1"
+    "@babel/core": "^7.23.3",
+    "@babel/preset-env": "^7.23.3",
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
+    "ascjs": "^6.0.3",
+    "c8": "^8.0.1",
+    "css-select": "^5.1.0",
+    "htmlparser2": "^9.0.0",
+    "linkedom": "^0.16.4",
+    "rollup": "^4.4.1",
+    "terser": "^5.24.0"
   },
   "module": "./esm/index.js",
   "type": "module",
