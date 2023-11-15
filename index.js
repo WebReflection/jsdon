@@ -1,7 +1,6 @@
 self.JSDON = (function (exports) {
   'use strict';
 
-  var NODE_END = -1;
   var ELEMENT_NODE = 1;
   var ATTRIBUTE_NODE = 2;
   var TEXT_NODE = 3;
@@ -9,6 +8,8 @@ self.JSDON = (function (exports) {
   var DOCUMENT_NODE = 9;
   var DOCUMENT_TYPE_NODE = 10;
   var DOCUMENT_FRAGMENT_NODE = 11;
+
+  var NODE_END = -1;
   var UNKNOWN = 42;
 
   var SVG = 'http://www.w3.org/2000/svg';

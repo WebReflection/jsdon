@@ -64,5 +64,8 @@
   "bugs": {
     "url": "https://github.com/WebReflection/jsdon/issues"
   },
-  "homepage": "https://github.com/WebReflection/jsdon#readme"
+  "homepage": "https://github.com/WebReflection/jsdon#readme",
+  "dependencies": {
+    "domconstants": "^1.1.6"
+  }
 }
