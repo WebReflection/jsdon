@@ -7,7 +7,8 @@ const {
   COMMENT_NODE,
   DOCUMENT_NODE,
   DOCUMENT_TYPE_NODE,
-  DOCUMENT_FRAGMENT_NODE
+  DOCUMENT_FRAGMENT_NODE,
+  UNKNOWN
 } = require('./constants.js');
 
 const mergeClosing = output => {
@@ -41,34 +42,38 @@ const pushFragment = ({childNodes}, output, filter) => {
 };
 
 const pushNode = (node, output, filter) => {
-  const {nodeType} = node;
-  switch (nodeType) {
-    case ELEMENT_NODE:
-      if (filter(node))
+  if (filter(node)) {
+    const {nodeType} = node;
+    switch (nodeType) {
+      case ELEMENT_NODE: {
         pushElement(node, output, filter);
-      break;
-    case TEXT_NODE:
-    case COMMENT_NODE:
-      if (filter(node))
+        break;
+      }
+      case TEXT_NODE:
+      case COMMENT_NODE: {
         output.push(nodeType, node.data);
-      break;
-    case DOCUMENT_FRAGMENT_NODE:
-    case DOCUMENT_NODE:
-      if (filter(node)) {
+        break;
+      }
+      case DOCUMENT_FRAGMENT_NODE:
+      case DOCUMENT_NODE: {
         output.push(nodeType);
         pushFragment(node, output, filter);
+        break;
       }
-      break;
-    case DOCUMENT_TYPE_NODE:
-      if (filter(node)) {
+      case DOCUMENT_TYPE_NODE: {
         const {name, publicId, systemId} = node;
         output.push(nodeType, name);
         if (publicId)
           output.push(publicId);
         if (systemId)
           output.push(systemId);
+        break;
       }
-      break;
+      default: {
+        output.push(UNKNOWN, node);
+        break;
+      }
+    }
   }
 };
 

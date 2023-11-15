@@ -75,3 +75,9 @@ document = fromJSON([9,10,"html","-//IETF//DTD HTML 2.0//EN",1,"html",1,"svg",1,
 console.assert(JSON.stringify(toJSON(document)) === JSON.stringify([9,10,"html","-//IETF//DTD HTML 2.0//EN",1,"html",1,"svg",1,"rect",-4]));
 document = fromJSON([9,10,"html","http://www.w3.org/TR/xhtml-basic/xhtml-basic10.dtd",1,"html",1,"svg",1,"rect",-4], document);
 console.assert(JSON.stringify(toJSON(document)) === JSON.stringify([9,10,"html","http://www.w3.org/TR/xhtml-basic/xhtml-basic10.dtd",1,"html",1,"svg",1,"rect",-4]));
+
+const unknown = {random: 'thing'};
+const strUnknown = JSON.stringify(toJSON(unknown));
+console.assert(strUnknown === JSON.stringify([42, unknown]));
+const revived = fromJSON(strUnknown, document, thing => document.createTextNode(thing.random));
+console.assert(revived.data === 'thing');

@@ -6,7 +6,8 @@ import {
   COMMENT_NODE,
   DOCUMENT_NODE,
   DOCUMENT_TYPE_NODE,
-  DOCUMENT_FRAGMENT_NODE
+  DOCUMENT_FRAGMENT_NODE,
+  UNKNOWN,
 } from './constants.js';
 
 const SVG = 'http://www.w3.org/2000/svg';
@@ -20,7 +21,7 @@ const {parse} = JSON;
  * @param {Document?} ownerDocument
  * @returns {Document|DocumentFragment|Element|Text|Comment}
  */
-export const fromJSON = (value, ownerDocument = document) => {
+export const fromJSON = (value, ownerDocument = document, unknown = Object) => {
   const array = typeof value === 'string' ? parse(value) : value;
   const {length} = array;
   const fragment = ownerDocument.createDocumentFragment();
@@ -104,6 +105,9 @@ export const fromJSON = (value, ownerDocument = document) => {
         break;
       case DOCUMENT_FRAGMENT_NODE:
         isFragment = true;
+        break;
+      case UNKNOWN:
+        parentNode.appendChild(unknown(array[i++]));
         break;
       default:
         do {
