@@ -41,12 +41,12 @@ const pushFragment = ({childNodes}, output, filter) => {
   mergeClosing(output);
 };
 
-const pushNode = (node, output, filter) => {
+const pushNode = (node, output, filter, unknown) => {
   if (filter(node)) {
     const {nodeType} = node;
     switch (nodeType) {
       case ELEMENT_NODE: {
-        pushElement(node, output, filter);
+        pushElement(node, output, filter, unknown);
         break;
       }
       case TEXT_NODE:
@@ -57,7 +57,7 @@ const pushNode = (node, output, filter) => {
       case DOCUMENT_FRAGMENT_NODE:
       case DOCUMENT_NODE: {
         output.push(nodeType);
-        pushFragment(node, output, filter);
+        pushFragment(node, output, filter, unknown);
         break;
       }
       case DOCUMENT_TYPE_NODE: {
@@ -70,7 +70,7 @@ const pushNode = (node, output, filter) => {
         break;
       }
       default: {
-        output.push(UNKNOWN, node);
+        output.push(UNKNOWN, unknown(node));
         break;
       }
     }
@@ -84,9 +84,9 @@ const yes = () => true;
  * @param {Document|DocumentFragment|Element|Text|Comment} node
  * @param {function?} filter if provided, filters nodes by returning `true` or `false`
  */
-const toJSON = (node, filter) => {
+const toJSON = (node, filter, unknown = Object) => {
   const output = [];
-  pushNode(node, output, filter || yes);
+  pushNode(node, output, filter || yes, unknown);
   return output;
 };
 exports.toJSON = toJSON;

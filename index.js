@@ -146,7 +146,7 @@ self.JSDON = (function (exports) {
     for (var i = 0, length = childNodes.length; i < length; i++) pushNode(childNodes[i], output, filter);
     mergeClosing(output);
   };
-  var pushNode = function pushNode(node, output, filter) {
+  var pushNode = function pushNode(node, output, filter, unknown) {
     if (filter(node)) {
       var nodeType = node.nodeType;
       switch (nodeType) {
@@ -180,7 +180,7 @@ self.JSDON = (function (exports) {
           }
         default:
           {
-            output.push(UNKNOWN, node);
+            output.push(UNKNOWN, unknown(node));
             break;
           }
       }
@@ -196,8 +196,9 @@ self.JSDON = (function (exports) {
    * @param {function?} filter if provided, filters nodes by returning `true` or `false`
    */
   var toJSON = function toJSON(node, filter) {
+    var unknown = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : Object;
     var output = [];
-    pushNode(node, output, filter || yes);
+    pushNode(node, output, filter || yes, unknown);
     return output;
   };
 
